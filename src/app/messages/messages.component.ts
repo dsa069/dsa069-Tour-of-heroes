@@ -7,7 +7,8 @@ import { MessageService } from '../message.service';
   standalone: true,
   imports: [CommonModule], // or you can use [NgIf] if you only need ngIf
   templateUrl: './messages.component.html',
-  styleUrl: './messages.component.scss'
+  styleUrl: './messages.component.scss',
+  providers: [MessageService]
 })
 export class MessagesComponent {
   constructor(public messageService: MessageService) {}

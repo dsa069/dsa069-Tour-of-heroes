@@ -1,9 +1,27 @@
 <div *ngIf="hero">
-
-    <h2>{{hero.name | uppercase}} Details</h2>
-    <div><span>id: </span>{{hero.id}}</div>
-    <div>
-      <label for="hero-name">Hero name: </label>
-      <input id="hero-name" [(ngModel)]="hero.name" placeholder="name">
+  <h2>{{hero.name | uppercase}} Details</h2>
+  <div><span>id: </span>{{hero.id}}</div>
+  <div>
+    <label for="hero-name">Hero name: </label>
+    <input id="hero-name" [(ngModel)]="hero.name" placeholder="name">
+  </div>
+  
+  <!-- Superpowers section -->
+  <div class="powers-section">
+    <h3>Superpowers</h3>
+    <ul class="powers-list">
+      <li *ngFor="let power of hero.powers">
+        <span>{{power}}</span>
+        <button type="button" class="delete-button" (click)="removePower(power)">x</button>
+      </li>
+    </ul>
+    
+    <div class="add-power">
+      <label for="new-power">Add superpower: </label>
+      <input id="new-power" [(ngModel)]="newPower" placeholder="new power">
+      <button type="button" (click)="addPower()">Add</button>
     </div>
+  </div>
+
+  <button type="button" (click)="goBack()">go back</button>
 </div>

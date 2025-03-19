@@ -1,0 +1,145 @@
+/* filepath: c:\Users\dsala\repos_cuarto\DRA\2.1-Tour-of-Heroes\tur_de_eroes\src\app\hero-detail\hero-detail.component.scss */
+/* Punk-styled Powers section with white background */
+.powers-section {
+  margin-top: 2rem;
+  background-color: #fff;
+  padding: 1rem;
+  border: 3px solid #000;
+  box-shadow: 5px 5px 0 #333;
+}
+
+.powers-section h3 {
+  color: #222;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: "Courier New", monospace;
+  border-bottom: 2px dashed #555;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px 0px #ccc;
+}
+
+.powers-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.powers-list li {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem;
+  background-color: #f0f0f0;
+  border-left: 4px solid #666;
+  transform: skew(-3deg);
+  color: #222;
+  text-shadow: none;
+  /* Remove margin since we're using gap in the grid */
+  margin: 0;
+}
+
+.powers-list li:nth-child(4n+1),
+.powers-list li:nth-child(4n+4) {
+  border-left-color: #333;
+}
+
+.powers-list span {
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.delete-button {
+  margin-top: 0;
+  padding: 0.3rem 0.6rem;
+  background-color: #444;
+  color: white;
+  border: 2px solid #000;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  transform: skew(5deg);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.delete-button:hover {
+  background-color: #666;
+  transform: skew(5deg) scale(1.1);
+  transition: all 0.1s;
+}
+
+.add-power {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.add-power label {
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.add-power input {
+  margin: 0 0.5rem;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #555;
+  caret-color: #555;
+  flex-grow: 1;
+}
+
+.add-power button {
+  margin-top: 0;
+  background-color: #555;
+  color: white;
+  border: 2px solid #000;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.add-power button:hover {
+  background-color: #777;
+  transform: translateY(-2px);
+  transition: all 0.1s;
+}
+
+label {
+  color: #555;
+  font-weight: bold;
+}
+
+input {
+  font-size: 1em;
+  padding: .5rem;
+  background-color: #fff;
+  border: 1px solid #777;
+  color: #333;
+}
+
+button {
+  margin-top: 20px;
+  margin-right: .5rem;
+  background-color: #444;
+  padding: 1rem;
+  border: 2px solid #222;
+  font-size: 1rem;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+button:hover {
+  background-color: #666;
+  border-color: #444;
+}
+
+button:disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: auto;
+}
