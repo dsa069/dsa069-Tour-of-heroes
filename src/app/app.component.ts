@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { HeroesComponent } from "./heroes/heroes.component";
+import { MessagesComponent } from "./messages/messages.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [HeroesComponent, MessagesComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'tur_de_eroes';
+  title = 'Tour of Heroes';
 }
