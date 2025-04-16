@@ -25,6 +25,10 @@ export class HeroDetailComponent implements OnInit {
   newSuperpowerDescription = '';
   loading = false;
   errorMessage = '';
+  originalHero?: Hero;  // To store the hero as it was loaded
+  pendingAddPowers: number[] = [];  // IDs of superpowers to add
+  pendingRemovePowers: number[] = [];  // IDs of superpowers to remove
+  hasChanges = false;  // Track if there are unsaved changes
   
   constructor(
     private route: ActivatedRoute,
@@ -46,6 +50,12 @@ export class HeroDetailComponent implements OnInit {
         next: hero => {
           console.log('Hero loaded:', hero);
           this.hero = hero;
+          // Store a deep copy of the original hero state
+          this.originalHero = JSON.parse(JSON.stringify(hero));
+          // Reset pending changes
+          this.pendingAddPowers = [];
+          this.pendingRemovePowers = [];
+          this.hasChanges = false;
         },
         error: error => {
           console.error('Error loading hero:', error);
@@ -68,8 +78,6 @@ export class HeroDetailComponent implements OnInit {
       });
   }
 
-  // Just update this method, leave others unchanged
-  // Just update the createAndAddPower method to show more detailed errors
   createAndAddPower(): void {
     if (!this.hero || !this.newSuperpowerName.trim()) { 
       this.errorMessage = "Hero or superpower name is missing";
@@ -79,151 +87,91 @@ export class HeroDetailComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
     
-    // Step 1: Create the superpower
+    // Step 1: Still need to create the superpower in the database
     const newPower = {
       name: this.newSuperpowerName.trim(),
       description: this.newSuperpowerDescription.trim() || ''
     };
     
-    console.log('STEP 1: Creating superpower with data:', newPower);
-    
     this.superpowerService.addSuperpower(newPower).subscribe({
       next: (createdPower) => {
-        console.log('STEP 1 SUCCESS: Created superpower:', createdPower);
-        
-        // More detailed ID debugging
-        console.log('ID details:', {
-          id: createdPower.id,
-          type: typeof createdPower.id,
-          hasValue: Boolean(createdPower.id),
-          numericValue: Number(createdPower.id)
-        });
-        
-        // Update the ID validation in createAndAddPower method
-        if (!createdPower.id || isNaN(createdPower.id) || createdPower.id <= 0) {
-          this.errorMessage = `Created superpower has invalid ID: ${createdPower.id}`;
-          this.loading = false;
-          return;
+        // Add to hero's powers locally instead of calling the server
+        if (!this.hero!.superpowers) {
+          this.hero!.superpowers = [];
         }
+        this.hero!.superpowers.push(createdPower);
         
-        if (isNaN(Number(createdPower.id)) || Number(createdPower.id) <= 0) {
-          this.errorMessage = `Created superpower has invalid ID: ${createdPower.id}`;
-          this.loading = false;
-          return;
-        }
+        // Track for later saving
+        this.pendingAddPowers.push(createdPower.id);
+        this.hasChanges = true;
         
-        // Clear form fields and show success message
+        // Clear form fields
         this.newSuperpowerName = '';
         this.newSuperpowerDescription = '';
-        this.messageService.add(`Created superpower: ${createdPower.name} with ID: ${createdPower.id}`);
-        
-        // Continue with adding to hero...
-        
-        // Step 2: Add the superpower to the hero
-        console.log('STEP 2: Adding superpower', createdPower.id, 'to hero', this.hero!.id);
-        
-        this.superpowerService.addSuperpowerToHero(this.hero!.id, createdPower.id).subscribe({
-          next: (updatedHero) => {
-            console.log('STEP 2 SUCCESS: Hero updated with new power:', updatedHero);
-            
-            // Extra validation to ensure we got a proper hero back
-            if (!updatedHero) {
-              this.errorMessage = "Server returned empty response after adding superpower to hero";
-              this.loading = false;
-              return;
-            }
-            
-            // Update hero in component
-            this.messageService.add(`Added superpower to hero ${this.hero!.name}`);
-            
-            // Store hero explicitly
-            this.hero = updatedHero;
-            
-            // Refresh data explicitly
-            this.getHero();
-            this.getSuperpowers();
-            
-            this.loading = false;
-          },
-          error: (err) => {
-            console.error('STEP 2 ERROR: Failed to add superpower to hero:', err);
-            let errorMsg = 'Error adding superpower to hero: ';
-            
-            if (err.status === 0) {
-              errorMsg += 'Cannot connect to server';
-            } else if (err.status === 404) {
-              errorMsg += 'Endpoint not found - check URL configuration';
-            } else if (err.error && typeof err.error === 'string') {
-              errorMsg += err.error;
-            } else if (err.message) {
-              errorMsg += err.message;
-            } else {
-              errorMsg += JSON.stringify(err);
-            }
-            
-            this.errorMessage = errorMsg;
-            this.loading = false;
-          }
-        });
+        this.messageService.add(`Created superpower: ${createdPower.name} (hero changes not saved yet)`);
+        this.loading = false;
       },
       error: (err) => {
-        console.error('STEP 1 ERROR: Failed to create superpower:', err);
-        this.errorMessage = `Error creating superpower: ${err.message || JSON.stringify(err)}`;
+        this.errorMessage = `Error creating superpower: ${err.message}`;
         this.loading = false;
       }
     });
   }
 
-  // Add an existing power to the hero
   addExistingPower(superpowerId: number): void {
     if (!this.hero) { return; }
     
-    this.loading = true;
-    this.errorMessage = '';
-    console.log('Adding existing superpower:', superpowerId, 'to hero:', this.hero.id);
-
-    this.superpowerService.addSuperpowerToHero(this.hero.id, superpowerId)
-      .pipe(
-        finalize(() => this.loading = false)
-      )
-      .subscribe({
-        next: (updatedHero) => {
-          console.log('Hero updated with existing power:', updatedHero);
-          this.hero = updatedHero;
-          // Refresh hero data to ensure we have latest information
-          this.getHero();
-        },
-        error: (error) => {
-          console.error('Error adding existing power:', error);
-          this.errorMessage = `Error adding superpower to hero: ${error.message || error}`;
-        }
-      });
+    // Check if this power is already in the hero's powers
+    if (this.hero.superpowers && this.hero.superpowers.some(p => p.id === superpowerId)) {
+      return; // Power already added
+    }
+    
+    // Find the superpower from all available powers
+    const powerToAdd = this.allSuperpowers.find(p => p.id === superpowerId);
+    if (!powerToAdd) { return; }
+    
+    // Add to hero's powers locally
+    if (!this.hero.superpowers) {
+      this.hero.superpowers = [];
+    }
+    this.hero.superpowers.push(powerToAdd);
+    
+    // Track this addition for later saving
+    this.pendingAddPowers.push(superpowerId);
+    
+    // If it was pending removal, remove from that list
+    const removeIndex = this.pendingRemovePowers.indexOf(superpowerId);
+    if (removeIndex > -1) {
+      this.pendingRemovePowers.splice(removeIndex, 1);
+    }
+    
+    this.hasChanges = true;
+    this.messageService.add(`Power "${powerToAdd.name}" added to hero (not saved yet)`);
   }
 
-  // Remove a power from the hero
   removePower(superpowerId: number): void {
-    if (!this.hero) { return; }
+    if (!this.hero || !this.hero.superpowers) { return; }
     
-    this.loading = true;
-    this.errorMessage = '';
-    console.log('Removing superpower:', superpowerId, 'from hero:', this.hero.id);
-
-    this.superpowerService.removeSuperpowerFromHero(this.hero.id, superpowerId)
-      .pipe(
-        finalize(() => this.loading = false)
-      )
-      .subscribe({
-        next: (updatedHero) => {
-          console.log('Hero updated after power removal:', updatedHero);
-          this.hero = updatedHero;
-          // Refresh hero data to ensure we have latest information
-          this.getHero();
-        },
-        error: (error) => {
-          console.error('Error removing power:', error);
-          this.errorMessage = `Error removing superpower from hero: ${error.message || error}`;
-        }
-      });
+    // Find the power to remove
+    const powerIndex = this.hero.superpowers.findIndex(p => p.id === superpowerId);
+    if (powerIndex === -1) { return; }
+    
+    const removedPower = this.hero.superpowers[powerIndex];
+    
+    // Remove locally
+    this.hero.superpowers.splice(powerIndex, 1);
+    
+    // Track this removal for later saving
+    this.pendingRemovePowers.push(superpowerId);
+    
+    // If it was pending addition, remove from that list
+    const addIndex = this.pendingAddPowers.indexOf(superpowerId);
+    if (addIndex > -1) {
+      this.pendingAddPowers.splice(addIndex, 1);
+    }
+    
+    this.hasChanges = true;
+    this.messageService.add(`Power "${removedPower.name}" removed from hero (not saved yet)`);
   }
 
   goBack(): void {
@@ -231,15 +179,63 @@ export class HeroDetailComponent implements OnInit {
   }
 
   save(): void {
-    if (this.hero) {
-      this.heroService.updateHero(this.hero)
-        .subscribe({
-          next: () => this.goBack(),
-          error: (error) => {
-            console.error('Error saving hero:', error);
-            this.errorMessage = `Error saving hero: ${error.message || error}`;
-          }
-        });
+    if (!this.hero) { return; }
+    
+    this.loading = true;
+    this.errorMessage = '';
+    
+    // Create an observable array for all operations
+    const operations: Observable<any>[] = [];
+    
+    // First add all pending add operations
+    this.pendingAddPowers.forEach(powerId => {
+      operations.push(
+        this.superpowerService.addSuperpowerToHero(this.hero!.id, powerId)
+      );
+    });
+    
+    // Then add all pending remove operations
+    this.pendingRemovePowers.forEach(powerId => {
+      operations.push(
+        this.superpowerService.removeSuperpowerFromHero(this.hero!.id, powerId)
+      );
+    });
+    
+    // Finally update the hero basic info
+    operations.push(this.heroService.updateHero(this.hero));
+    
+    // Execute all operations in sequence
+    if (operations.length > 0) {
+      forkJoin(operations).subscribe({
+        next: responses => {
+          console.log('All changes saved successfully:', responses);
+          this.messageService.add('Hero updated with all superpower changes');
+          this.hasChanges = false;
+          this.pendingAddPowers = [];
+          this.pendingRemovePowers = [];
+          this.loading = false;
+          this.goBack();
+        },
+        error: err => {
+          console.error('Error saving changes:', err);
+          this.errorMessage = `Error saving changes: ${err.message}`;
+          this.loading = false;
+        }
+      });
+    } else {
+      // No changes, just update the hero
+      this.heroService.updateHero(this.hero).subscribe({
+        next: () => {
+          this.messageService.add('Hero updated');
+          this.loading = false;
+          this.goBack();
+        },
+        error: (error) => {
+          console.error('Error saving hero:', error);
+          this.errorMessage = `Error saving hero: ${error.message || error}`;
+          this.loading = false;
+        }
+      });
     }
   }
 }

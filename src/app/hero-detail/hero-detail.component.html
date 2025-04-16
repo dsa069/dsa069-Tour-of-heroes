@@ -55,6 +55,11 @@
     </div>
   </div>
 
+  <!-- Add this near your "save" button -->
+  <div *ngIf="hasChanges" class="pending-changes-alert">
+    You have unsaved superpower changes. Click "save" to apply them.
+  </div>
+
   <button type="button" (click)="goBack()">go back</button>
-  <button type="button" (click)="save()">save</button>
+  <button type="button" (click)="save()" [disabled]="!hero?.name">save</button>
 </div>
