@@ -67,6 +67,10 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json",
+            "buildTarget": "tur_de_eroes:build"
+          },
           "configurations": {
             "production": {
               "buildTarget": "tur_de_eroes:build:production"

@@ -143,3 +143,82 @@ button:disabled {
   color: #888;
   cursor: auto;
 }
+
+/* Add these styles to your existing stylesheet */
+
+.error-message {
+  background-color: #ffdddd;
+  color: #d8000c;
+  border: 1px solid #d8000c;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+}
+
+.loading {
+  padding: 10px;
+  font-style: italic;
+  color: #666;
+}
+
+.no-powers {
+  font-style: italic;
+  color: #666;
+  margin: 10px 0;
+}
+
+.form-row {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.form-row label {
+  width: 100px;
+  margin-right: 10px;
+}
+
+.description {
+  font-size: 0.8em;
+  color: #666;
+  font-style: italic;
+  margin-left: 10px;
+}
+
+.add-existing-power {
+  margin-top: 20px;
+  border-top: 1px dashed #ccc;
+  padding-top: 20px;
+}
+
+.available-powers-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.add-button {
+  margin-top: 0;
+  padding: 0.3rem 0.6rem;
+  background-color: #4CAF50;
+  color: white;
+  border: 2px solid #2E7D32;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  transform: skew(5deg);
+  box-shadow: 2px 2px 0 #2E7D32;
+}
+
+.add-button:hover {
+  background-color: #2E7D32;
+  transform: skew(5deg) scale(1.1);
+}
+
+h4 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: bold;
+}

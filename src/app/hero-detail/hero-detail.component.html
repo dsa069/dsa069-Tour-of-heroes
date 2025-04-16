@@ -9,19 +9,52 @@
   <!-- Superpowers section -->
   <div class="powers-section">
     <h3>Superpowers</h3>
+    
+    <!-- Display error message if any -->
+    <div class="error-message" *ngIf="errorMessage">{{errorMessage}}</div>
+    
+    <!-- Loading indicator -->
+    <div class="loading" *ngIf="loading">Loading...</div>
+    
+  <!-- List of current hero powers -->
+  <div *ngIf="hero.superpowers && hero.superpowers.length > 0">
+    <h4>Current Powers</h4>
     <ul class="powers-list">
-      <li *ngFor="let power of hero.powers">
-        <span>{{power}}</span>
-        <button type="button" class="delete-button" (click)="removePower(power)">x</button>
+      <li *ngFor="let power of hero.superpowers">
+        <span>{{power.name}}</span>
+        <span *ngIf="power.description" class="description">{{power.description}}</span>
+        <button type="button" class="delete-button" (click)="removePower(power.id)">x</button>
       </li>
     </ul>
+  </div>
     
+    <!-- Create new superpower form -->
     <div class="add-power">
-      <label for="new-power">Add superpower: </label>
-      <input id="new-power" [(ngModel)]="newPower" placeholder="new power">
-      <button type="button" (click)="addPower()">Add</button>
+      <h4>Create New Superpower</h4>
+      <div class="form-row">
+        <label for="new-power-name">Name:</label>
+        <input id="new-power-name" [(ngModel)]="newSuperpowerName" placeholder="Power name">
+      </div>
+      <div class="form-row">
+        <label for="new-power-desc">Description:</label>
+        <input id="new-power-desc" [(ngModel)]="newSuperpowerDescription" placeholder="Power description">
+      </div>
+      <button type="button" (click)="createAndAddPower()" [disabled]="!newSuperpowerName.trim()">Create & Add Power</button>
+    </div>
+    
+    <!-- Add existing superpower section -->
+    <div class="add-existing-power" *ngIf="allSuperpowers.length > 0">
+      <h4>Add Existing Superpower</h4>
+      <ul class="available-powers-list">
+        <li *ngFor="let power of allSuperpowers">
+          <span>{{power.name}}</span>
+          <span *ngIf="power.description" class="description">{{power.description}}</span>
+          <button type="button" class="add-button" (click)="addExistingPower(power.id)">+</button>
+        </li>
+      </ul>
     </div>
   </div>
 
   <button type="button" (click)="goBack()">go back</button>
+  <button type="button" (click)="save()">save</button>
 </div>
