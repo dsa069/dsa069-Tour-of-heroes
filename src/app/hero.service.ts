@@ -60,12 +60,13 @@ export class HeroService {
   updateHero(hero: Hero): Observable<any> {
     const url = `${this.heroesUrl}/${hero.id}`;
     
-    // Create a hero object that includes superpowers
+    // Create a hero object that includes all needed properties
     const apiHero = {
       id: hero.id,
       name: hero.name,
-      alterEgo: '', // Include this empty field as the API expects it
-      superpowers: hero.superpowers // IMPORTANT: Include superpowers to prevent them from being removed
+      alterEgo: hero.alterEgo || '',
+      superpowers: hero.superpowers,
+      imageUrl: hero.imageUrl // Preserve the image URL
     };
     
     return this.http.put(url, apiHero, this.httpOptions).pipe(
@@ -100,6 +101,32 @@ export class HeroService {
     return this.http.delete<Hero>(url, this.httpOptions).pipe(
       tap(_ => this.log(`deleted hero id=${id}`)),
       catchError(this.handleError<Hero>('deleteHero'))
+    );
+  }
+
+  /** GET heroes whose name contains search term */
+  searchHeroes(term: string): Observable<Hero[]> {
+    if (!term.trim()) {
+      // If no search term, return all heroes
+      return this.getHeroes();
+    }
+    
+    const url = `${this.heroesUrl}/search?name=${term}`;
+    return this.http.get<Hero[]>(url).pipe(
+      map(heroes => {
+        // Transform API heroes to our app model if needed
+        return heroes.map(hero => ({
+          id: hero.id,
+          name: hero.name,
+          alterEgo: hero.alterEgo,
+          superpowers: hero.superpowers || [],
+          powers: hero.powers || []
+        }));
+      }),
+      tap(x => x.length ?
+        this.log(`found heroes matching "${term}"`) :
+        this.log(`no heroes matching "${term}"`)),
+      catchError(this.handleError<Hero[]>('searchHeroes', []))
     );
   }
 

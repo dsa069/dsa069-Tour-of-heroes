@@ -9,7 +9,7 @@ import { HeroService } from '../hero.service';
 import { SuperpowerService } from '../superpower.service';
 import { MessageService } from '../message.service'; // Add this import
 import { Observable, forkJoin, of } from 'rxjs';
-import { catchError, finalize, tap, switchMap } from 'rxjs/operators';
+import { MarvelApiService } from '../marvel-api.service';
 
 @Component({
   selector: 'app-hero-detail',
@@ -34,8 +34,9 @@ export class HeroDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private heroService: HeroService,
     private superpowerService: SuperpowerService,
+    private marvelApiService: MarvelApiService, // Add this
     private location: Location,
-    private messageService: MessageService // Add MessageService
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -50,12 +51,13 @@ export class HeroDetailComponent implements OnInit {
         next: hero => {
           console.log('Hero loaded:', hero);
           this.hero = hero;
-          // Store a deep copy of the original hero state
           this.originalHero = JSON.parse(JSON.stringify(hero));
-          // Reset pending changes
           this.pendingAddPowers = [];
           this.pendingRemovePowers = [];
           this.hasChanges = false;
+          
+          // Get the hero image after loading the hero
+          this.getHeroImage();
         },
         error: error => {
           console.error('Error loading hero:', error);
@@ -76,6 +78,21 @@ export class HeroDetailComponent implements OnInit {
           this.errorMessage = `Error loading superpowers: ${error.message}`;
         }
       });
+  }
+
+  getHeroImage(): void {
+    if (this.hero && !this.hero.imageUrl) {
+      this.marvelApiService.getHeroImage(this.hero.name).subscribe({
+        next: (imageUrl) => {
+          if (imageUrl) {
+            this.hero!.imageUrl = imageUrl;
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching hero image:', error);
+        }
+      });
+    }
   }
 
   createAndAddPower(): void {

@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-heroes',
@@ -15,6 +17,7 @@ import { HeroService } from '../hero.service';
 export class HeroesComponent implements OnInit {
   heroes: Hero[] = [];
   heroName = '';
+  isSearching = false;
 
   constructor(private heroService: HeroService) { }
 
@@ -43,6 +46,31 @@ export class HeroesComponent implements OnInit {
         this.heroes.push(hero);
         this.heroName = ''; // Clear the input
       });
+  }
+
+  search(): void {
+    if (!this.heroName.trim()) {
+      this.getHeroes();
+      return;
+    }
+    
+    this.isSearching = true;
+    this.heroService.searchHeroes(this.heroName)
+      .subscribe({
+        next: heroes => {
+          this.heroes = heroes;
+          this.isSearching = false;
+        },
+        error: err => {
+          console.error('Error searching heroes:', err);
+          this.isSearching = false;
+        }
+      });
+  }
+
+  clearSearch(): void {
+    this.heroName = '';
+    this.getHeroes();
   }
 
   delete(hero: Hero): void {

@@ -88,3 +88,34 @@ button.delete:hover {
   background-color: #525252;
   color: white;
 }
+
+.search-button {
+  padding: .5rem 1.5rem;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  margin-right: 0.5rem;
+  background-color: #4CAF50;
+}
+
+.search-button:hover {
+  color: white;
+  background-color: #388E3C;
+}
+
+.clear-button {
+  padding: .5rem 1.5rem;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  background-color: #9E9E9E;
+}
+
+.clear-button:hover {
+  color: white;
+  background-color: #757575;
+}
+
+.loading {
+  font-style: italic;
+  color: #555;
+  margin-bottom: 1rem;
+}

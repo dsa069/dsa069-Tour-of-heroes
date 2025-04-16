@@ -6,6 +6,18 @@
     <input id="hero-name" [(ngModel)]="hero.name" placeholder="name">
   </div>
   
+  <!-- Add this after the hero name section -->
+  <div class="hero-image" *ngIf="hero.imageUrl">
+    <img [src]="hero.imageUrl" alt="{{hero.name}}" />
+  </div>
+  <div class="no-image" *ngIf="!hero.imageUrl">
+    <p>No Marvel image available for this hero</p>
+  </div>
+  <!-- Add this to the bottom of hero-detail.component.html -->
+  <div class="marvel-attribution" *ngIf="hero.imageUrl">
+    <p>Data provided by Marvel. © 2023 MARVEL</p>
+  </div>
+
   <!-- Superpowers section -->
   <div class="powers-section">
     <h3>Superpowers</h3>

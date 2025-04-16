@@ -1,11 +1,24 @@
 <h2>My Heroes</h2>
 
 <div>
-  <label for="new-hero">Hero name: </label>
-  <input id="new-hero" [(ngModel)]="heroName" placeholder="Hero name"/>
+  <label for="hero-input">Hero name: </label>
+  <input id="hero-input" [(ngModel)]="heroName" placeholder="Hero name"/>
+  
+  <button type="button" class="search-button" (click)="search()">
+    Search heroes
+  </button>
+  
   <button type="button" class="add-button" (click)="add()">
     Add hero
   </button>
+  
+  <button *ngIf="heroName" type="button" class="clear-button" (click)="clearSearch()">
+    Clear search
+  </button>
+</div>
+
+<div *ngIf="isSearching" class="loading">
+  Searching...
 </div>
 
 <ul class="heroes">
