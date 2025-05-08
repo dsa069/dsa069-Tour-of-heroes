@@ -29,7 +29,7 @@ export class HeroService {
         id: hero.id,
         name: hero.name,
         alterEgo: hero.alterEgo,
-        superpowers: hero.superpowers || [], // Correctly map superpowers from backend
+        superpowers: hero.superpowers || [], // Array de superpoderes
         powers: [] // Keep powers for backwards compatibility
       })),
       tap(_ => this.log(`fetched hero id=${id}`)),

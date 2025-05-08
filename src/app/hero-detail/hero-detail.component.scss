@@ -69,11 +69,15 @@
 
 .add-power {
   margin-top: 1.5rem;
-  display: flex;
-  align-items: center;
+  display: block; /* Change from flex to block for vertical layout */
   background-color: #f0f0f0;
-  padding: 10px;
+  padding: 15px;
   border: 1px solid #ccc;
+}
+
+.add-power h4 {
+  text-transform: none; /* Remove uppercase transformation */
+  margin-bottom: 15px;
 }
 
 .add-power label {
@@ -92,7 +96,7 @@
 }
 
 .add-power button {
-  margin-top: 0;
+  margin-top: 15px;
   background-color: #555;
   color: white;
   border: 2px solid #000;
@@ -168,14 +172,19 @@ button:disabled {
 }
 
 .form-row {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
 }
 
 .form-row label {
-  width: 100px;
+  min-width: 100px; /* Use min-width instead of width for consistency */
   margin-right: 10px;
+}
+
+.form-row input {
+  flex: 1; /* Make inputs take remaining space */
+  max-width: 300px; /* Prevent inputs from getting too wide */
 }
 
 .description {

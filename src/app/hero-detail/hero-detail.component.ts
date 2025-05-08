@@ -56,7 +56,6 @@ export class HeroDetailComponent implements OnInit {
           this.pendingRemovePowers = [];
           this.hasChanges = false;
           
-          // Get the hero image after loading the hero
           this.getHeroImage();
         },
         error: error => {
